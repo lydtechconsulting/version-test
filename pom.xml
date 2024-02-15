@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.lydtech</groupId>
-    <artifactId>versiontest</artifactId>
+    <artifactId>version-test</artifactId>
     <version>1.0.1</version>
 
     <properties>
