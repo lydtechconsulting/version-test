@@ -43,9 +43,9 @@ jobs:
         git config --global user.name "$(git log -1 --pretty=format:'%an')"
         
         case "${{ env.version_change }}" in
-          major) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextMajor}-SNAPSHOT -Darguments="-DskipTests"  -B ;;
-          minor) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextMinor}-SNAPSHOT -Darguments="-DskipTests"  -B ;;
-          *) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextIncremental}-SNAPSHOT -Darguments="-DskipTests"  -B ;;
+          major) mvn release:prepare -DdryRun=true release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextMajor}-SNAPSHOT -Darguments="-DskipTests"  -B ;;
+          minor) mvn release:prepare -DdryRun=true release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextMinor}-SNAPSHOT -Darguments="-DskipTests"  -B ;;
+          *) mvn release:prepare -DdryRun=true release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextIncremental}-SNAPSHOT -Darguments="-DskipTests"  -B ;;
         esac
         new_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
         echo "Updating version to: ${new_version}"
