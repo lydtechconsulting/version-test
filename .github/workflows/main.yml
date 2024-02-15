@@ -34,8 +34,8 @@ jobs:
           export version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout')
           git config --global user.email "$(git log -1 --pretty=format:'%ae')"
           git config --global user.name "$(git log -1 --pretty=format:'%an')"
-          git tag -a v$version -m "v$version"
-          git push origin $version
+          git tag v${version}
+          git push origin v$version
           echo "Tagged: v${version}"
 
 #      - name: Release to Nexus Repository
