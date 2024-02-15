@@ -19,9 +19,29 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Determine Version Change
+        run: |
+          # Extract the commit message of the latest commit on the main branch
+          COMMIT_MSG=$(git log -1 --pretty=format:%s)
+          if [[ "$COMMIT_MSG" =~ (BREAKING CHANGE:|major:|major!) ]]; then
+          echo "version_change=major" 
+          elif [[ "$COMMIT_MSG" =~ (feat:|feat!) ]]; then
+          echo "version_change=minor"
+          else
+          echo "version_change=patch"
+          fi >> $GITHUB_OUTPUT
+
       - name: Increment Version
         run: |
-          mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion} versions:commit
+          #mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion} versions:commit
+          
+          version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          case "${{ env.version_change }}" in
+          major) mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.nextMajorVersion}.0.0 versions:commit ;;
+          minor) mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0 versions:commit ;;
+          *) mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion} versions:commit ;;
+          esac
+          
           git config --global user.email "$(git log -1 --pretty=format:'%ae')"
           git config --global user.name "$(git log -1 --pretty=format:'%an')"com
           git add .
