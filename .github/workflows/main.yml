@@ -43,6 +43,7 @@ jobs:
           *) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextIncremental}-SNAPSHOT -B ;;
         esac
         new_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        echo "Updating version to ${new_version}"
 
     - name: Push Version Change
       run: |
