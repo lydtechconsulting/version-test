@@ -30,7 +30,7 @@ jobs:
         if [[ "$COMMIT_MSG" =~ (BREAKING CHANGE:|feat:|feat!) ]]; then
           echo "version_change=major_minor" >> $GITHUB_OUTPUT
         else
-          echo "version_change=major_minor" >> $GITHUB_OUTPUT
+          echo "version_change=patch_only" >> $GITHUB_OUTPUT
         fi
 
     - name: Increment Patch Version
