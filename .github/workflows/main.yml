@@ -1,63 +1,41 @@
-name: Main Flow
-
-on:
-  push:
-    branches: [ "main" ]
-
 jobs:
   build:
-    name: Main - Build, Test And Release
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
         distribution: 'temurin'
         cache: maven
 
-    - name: Build and Test
-      run: mvn package
+      - name: Increment Version
+        run: |
+          ./mvnw build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion} versions:commit
+          git config --global user.email "$(git log -1 --pretty=format:'%ae')"
+          git config --global user.name "$(git log -1 --pretty=format:'%an')"com
+          git add .
+          git commit -m "Updated version in pom.xml"
+          git push
+          echo "Updated version to: ${parsedVersion}"
 
-    - name: Determine Version Change
-      run: |
-        # Extract the commit message of the latest commit on the main branch
-        COMMIT_MSG=$(git log -1 --pretty=format:%s)
-        if [[ "$COMMIT_MSG" =~ (BREAKING CHANGE:|major:|major!) ]]; then
-          echo "version_change=major" 
-        elif [[ "$COMMIT_MSG" =~ (feat:|feat!) ]]; then
-          echo "version_change=minor"
-        else
-          echo "version_change=patch"
-        fi >> $GITHUB_OUTPUT
+      - name: Create Git Tag
+        run: |
+          export version=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout')
+          git config --global user.email "$(git log -1 --pretty=format:'%ae')"
+          git config --global user.name "$(git log -1 --pretty=format:'%an')"
+          git tag -a v$version -m "v$version"
+          git push origin $version
+          echo "Tagged: v${version}"
 
-    - name: Increment Version
-      run: |
-        version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-        echo "Current version: ${version}"
-        
-        # Configure Git credentials using author's information from the latest commit on the main branch
-        git config --global user.email "$(git log -1 --pretty=format:'%ae')"
-        git config --global user.name "$(git log -1 --pretty=format:'%an')"
-        
-        case "${{ env.version_change }}" in
-          major) mvn release:prepare -DdryRun=true release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextMajor}-SNAPSHOT -Darguments="-DskipTests"  -B ;;
-          minor) mvn release:prepare -DdryRun=true release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextMinor}-SNAPSHOT -Darguments="-DskipTests"  -B ;;
-          *) mvn release:prepare -DdryRun=true release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextIncremental}-SNAPSHOT -Darguments="-DskipTests"  -B ;;
-        esac
-        new_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-        echo "Updating version to: ${new_version}"
-
-    - name: Push Version Change
-      run: |
-        # Configure Git credentials using author's information from the latest commit on the main branch
-        git config --global user.email "$(git log -1 --pretty=format:'%ae')"
-        git config --global user.name "$(git log -1 --pretty=format:'%an')"
-                
-        # Commit the changes
-        git commit -m "Updated version to ${new_version}" pom.xml
-        git push origin main
-        
-        echo "Updated version to: ${new_version}"
+#      - name: Release to Nexus Repository
+#        uses: samuelmeuli/action-maven-publish@v1
+#        with:
+#          gpg_private_key: ${{ secrets.GPG_SIGNING_KEY }}
+#          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
+#          nexus_username: ${{ secrets.OSSRH_USERNAME }}
+#          nexus_password: ${{ secrets.OSSRH_PASSWORD }}
