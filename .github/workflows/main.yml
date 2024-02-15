@@ -27,11 +27,11 @@ jobs:
           git add .
           git commit -m "Updated version in pom.xml"
           git push
-          echo "Updated version to: $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout')"
+          echo "Updated version to: $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
 
       - name: Create Git Tag
         run: |
-          export version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout')
+          export version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "Tagging with: v${version}"
           git config --global user.email "$(git log -1 --pretty=format:'%ae')"
           git config --global user.name "$(git log -1 --pretty=format:'%an')"
