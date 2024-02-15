@@ -2,6 +2,8 @@
 
 Test project for Github Actions workflows to increment versions. 
 
-For auto increment of patch version, merge a change to main.
+For a major version
 
-For manual increment of minor or major version, start commit message with `feat:`
+- To increment major version, commit should start `major:`.
+- To increment minor version, commit should start `feat:`.
+- Otherwise it increments patch version. 
