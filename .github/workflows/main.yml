@@ -41,6 +41,7 @@ jobs:
           minor) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=nextMinor -B ;;
           *) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=nextIncremental -B ;;
         esac
+        new_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 
     - name: Push Version Change
       run: |
@@ -49,7 +50,7 @@ jobs:
         git config --global user.name "$(git log -1 --pretty=format:'%an')"
                 
         # Commit the changes
-        git commit -m "Updated version to $NEW_VERSION" pom.xml
-        git push
+        git commit -m "Updated version to ${new_version}" pom.xml
+        git push origin main
         
-        echo "Updated pom.xml with version $NEW_VERSION"
+        echo "Updated version to ${new_version}"
