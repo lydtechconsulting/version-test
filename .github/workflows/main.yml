@@ -1,0 +1,64 @@
+name: Main Flow
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Main Build, Test And Version
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with Maven
+      run: mvn package
+
+    - name: Determine version change
+      id: determine_version_change
+      run: |
+        # Extract the commit message of the latest commit on the main branch
+        COMMIT_MSG=$(git log -1 --pretty=format:%s)
+
+        # Check if the commit message contains "BREAKING CHANGE:", "feat:", or "feat!"
+        if [[ "$COMMIT_MSG" =~ (BREAKING CHANGE:|feat:|feat!) ]]; then
+          echo "::set-output name=version_change::major_minor"
+        else
+          echo "::set-output name=version_change::patch_only"
+        fi
+
+    - name: Increment Patch Version
+      if: steps.determine_version_change.outputs.version_change == 'patch_only'
+      run: |
+        # Parse the current version from pom.xml
+        CURRENT_VERSION=$(grep -oPm1 "(?<=<version>)[^<]+" pom.xml)
+
+        # Extract major, minor, and patch version components
+        MAJOR=$(echo $CURRENT_VERSION | cut -d'.' -f1)
+        MINOR=$(echo $CURRENT_VERSION | cut -d'.' -f2)
+        PATCH=$(echo $CURRENT_VERSION | cut -d'.' -f3)
+
+        # Increment the patch version
+        PATCH=$((PATCH + 1))
+
+        # Generate the new version
+        NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+
+        # Replace the old version with the new version in pom.xml
+        sed -i "s/<version>$CURRENT_VERSION<\/version>/<version>$NEW_VERSION<\/version>/" pom.xml
+        
+        echo "Updated pom.xml with version $NEW_VERSION"
+        
+        # Configure Git credentials using author's information from the latest commit on main branch
+        git config --global user.email "$(git log -1 --pretty=format:'%ae')"
+        git config --global user.name "$(git log -1 --pretty=format:'%an')"
+        
+        # Commit the changes
+        git commit -m "Incremented patch version to $NEW_VERSION" pom.xml
+        git push
