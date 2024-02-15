@@ -28,9 +28,9 @@ jobs:
 
         # Check if the commit message contains "BREAKING CHANGE:", "feat:", or "feat!"
         if [[ "$COMMIT_MSG" =~ (BREAKING CHANGE:|feat:|feat!) ]]; then
-          echo "::set-output name=version_change::major_minor"
+          echo "version_change=major_minor" >> $GITHUB_OUTPUT
         else
-          echo "::set-output name=version_change::patch_only"
+          echo "version_change=major_minor" >> $GITHUB_OUTPUT
         fi
 
     - name: Increment Patch Version
