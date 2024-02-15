@@ -14,6 +14,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <scm>
+        <connection>scm:git:git://github.com/lydtechconsulting/version-test.git</connection>
+        <developerConnection>scm:git:ssh://github.com:lydtechconsulting/version-test.git</developerConnection>
+        <url>https://github.com/lydtechconsulting/version-test/tree/main</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>
