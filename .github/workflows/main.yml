@@ -36,14 +36,15 @@ jobs:
     - name: Increment Version
       run: |
         version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-
+        echo "Current version: ${version}"
+  
         case "${{ env.version_change }}" in
           major) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextMajor}-SNAPSHOT -B ;;
           minor) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextMinor}-SNAPSHOT -B ;;
           *) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextIncremental}-SNAPSHOT -B ;;
         esac
         new_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-        echo "Updating version to ${new_version}"
+        echo "Updating version to: ${new_version}"
 
     - name: Push Version Change
       run: |
@@ -55,4 +56,4 @@ jobs:
         git commit -m "Updated version to ${new_version}" pom.xml
         git push origin main
         
-        echo "Updated version to ${new_version}"
+        echo "Updated version to: ${new_version}"
