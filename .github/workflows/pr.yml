@@ -1,4 +1,4 @@
-name: Main Flow
+name: PR Flow
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Main - Build, Test And Version
+    name: PR - Build, Test And Version
     runs-on: ubuntu-latest
 
     steps:
