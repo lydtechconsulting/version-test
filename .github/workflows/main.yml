@@ -33,7 +33,7 @@ jobs:
 
       - name: Increment Version
         run: |
-          echo "Version change: ${steps.determine_version_change.outputs.version_change}"
+          echo "Version change: ${{steps.determine_version_change.outputs.version_change}}"
           
           version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           case "${{ steps.determine_version_change.outputs.version_change }}" in
