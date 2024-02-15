@@ -42,9 +42,9 @@ jobs:
 #          *) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=nextIncremental -B ;;
 #        esac
         case "${{ env.version_change }}" in
-          major) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${version}-SNAPSHOT -B ;;
-          minor) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${version}-SNAPSHOT -B ;;
-          *) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${version}-SNAPSHOT -B ;;
+          major) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextMajor}-SNAPSHOT -B ;;
+          minor) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextMinor}-SNAPSHOT -B ;;
+          *) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextIncremental}-SNAPSHOT -B ;;
         esac
         new_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 
