@@ -36,10 +36,15 @@ jobs:
     - name: Increment Version
       run: |
         version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+#        case "${{ env.version_change }}" in
+#          major) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=nextMajor -B ;;
+#          minor) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=nextMinor -B ;;
+#          *) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=nextIncremental -B ;;
+#        esac
         case "${{ env.version_change }}" in
-          major) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=nextMajor -B ;;
-          minor) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=nextMinor -B ;;
-          *) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=nextIncremental -B ;;
+          major) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${version}-SNAPSHOT -B ;;
+          minor) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${version}-SNAPSHOT -B ;;
+          *) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${version}-SNAPSHOT -B ;;
         esac
         new_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 
