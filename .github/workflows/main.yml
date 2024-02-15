@@ -20,6 +20,7 @@ jobs:
           cache: maven
 
       - name: Determine Version Change
+        id: determine_version_change
         run: |
           # Extract the commit message of the latest commit on the main branch
           COMMIT_MSG=$(git log -1 --pretty=format:%s)
