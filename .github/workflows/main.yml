@@ -37,11 +37,15 @@ jobs:
       run: |
         version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
         echo "Current version: ${version}"
-  
+        
+        # Configure Git credentials using author's information from the latest commit on the main branch
+        git config --global user.email "$(git log -1 --pretty=format:'%ae')"
+        git config --global user.name "$(git log -1 --pretty=format:'%an')"
+        
         case "${{ env.version_change }}" in
-          major) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextMajor}-SNAPSHOT -B ;;
-          minor) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextMinor}-SNAPSHOT -B ;;
-          *) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextIncremental}-SNAPSHOT -B ;;
+          major) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextMajor}-SNAPSHOT -Darguments="-DskipTests"  -B ;;
+          minor) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextMinor}-SNAPSHOT -Darguments="-DskipTests"  -B ;;
+          *) mvn release:prepare release:update-versions -DautoVersionSubmodules=true -DdevelopmentVersion=${nextIncremental}-SNAPSHOT -Darguments="-DskipTests"  -B ;;
         esac
         new_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
         echo "Updating version to: ${new_version}"
