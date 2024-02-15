@@ -36,7 +36,7 @@ jobs:
           #mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion} versions:commit
           
           version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          case "${{ env.version_change }}" in
+          case "${{ steps.determine_version_change.outputs.version_change }}" in
           major) mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.nextMajorVersion}.0.0 versions:commit ;;
           minor) mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0 versions:commit ;;
           *) mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion} versions:commit ;;
