@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    name: Main - Build, Test And Version
     runs-on: ubuntu-latest
 
     steps:
